@@ -1,23 +1,42 @@
 import streamlit as st
+from datetime import datetime, timedelta
+import json
 
-st.sidebar.success("Select a demo above.")
+def calcular_data_util(data_inicial, num_dias, holidays):
+    data_atual = datetime.strptime(data_inicial.strftime("%Y-%m-%d"), "%Y-%m-%d")
+    dias_uteis = 0
 
-st.markdown(
-        """
-        Streamlit is an open-source app framework built specifically for
-        Machine Learning and Data Science projects.
-        **👈 Select a demo from the sidebar** to see some examples
-        of what Streamlit can do!
-        ### Want to learn more?
-        - Check out [streamlit.io](https://streamlit.io)
-        - Jump into our [documentation](https://docs.streamlit.io)
-        - Ask a question in our [community
-          forums](https://discuss.streamlit.io)
-        ### See more complex demos
-        - Use a neural net to [analyze the Udacity Self-driving Car Image
-          Dataset](https://github.com/streamlit/demo-self-driving)
-        - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
-    """
-    )
+    while dias_uteis < num_dias:
+        data_atual += timedelta(days=1)
+        if data_atual.strftime("%Y-%m-%d") not in [feriado["data"] for feriado in holidays]:
+            dias_uteis += 1
 
-st.header("Hello world")
+    return data_atual
+
+def load_holidays_from_json(file_path):
+    with open(file_path, "r", encoding="utf-8") as f:
+        holidays = json.load(f)
+    return holidays
+
+def main():
+  st.sidebar.header("🗓️ Lista de Feriados 2024")
+
+  holidays = load_holidays_from_json("feriados2024.json")
+  for holiday in holidays:
+    st.sidebar.write(f"Data: {holiday['data']}: {holiday['feriado']}")
+
+  st.header("⌚ Calculadora de Dias Úteis 2024")
+
+  data_inicial = st.date_input("Data inicial")
+
+  num_dias = st.number_input("Número de dias a serem somados", min_value=1)
+
+  # Calcular a data após somar os dias úteis
+  data_final = calcular_data_util(data_inicial, num_dias, holidays)
+
+  # Exibir o resultado na tela
+  st.subheader("Data Após Somar Dias Úteis")
+  st.write(data_final.strftime("%d/%m/%Y"))
+
+if __name__ == "__main__":
+    main()
