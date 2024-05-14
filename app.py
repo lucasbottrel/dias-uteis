@@ -25,7 +25,11 @@ def main():
 
   holidays = load_holidays_from_json("feriados2024.json")
   for holiday in holidays:
-    st.sidebar.write(f"Data: {holiday['data']}: {holiday['feriado']}")
+    holiday_date = datetime.strptime(holiday["data"], "%d/%m/%Y").date()
+    if holiday_date < datetime.now().date():
+            st.sidebar.write(f"<span style='color:gray'>{holiday['data']} - {holiday['feriado']}</span>", unsafe_allow_html=True)
+    else:
+        st.sidebar.write(f"{holiday['data']} - {holiday['feriado']}")
 
   st.header("⌚ Calculadora de Dias Úteis 2024")
 
