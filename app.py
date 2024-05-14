@@ -8,11 +8,13 @@ def calcular_data_util(data_inicial, num_dias, holidays):
 
     while dias_uteis < num_dias:
         data_atual += timedelta(days=1)
-        if data_atual.strftime("%Y-%m-%d") not in [feriado["data"] for feriado in holidays]:
-            dias_uteis += 1
+
+        if data_atual.weekday() >= 5 or data_atual.strftime("%Y-%m-%d") in holidays:
+            continue
+        dias_uteis += 1
 
     return data_atual
-
+    
 def load_holidays_from_json(file_path):
     with open(file_path, "r", encoding="utf-8") as f:
         holidays = json.load(f)
@@ -31,10 +33,8 @@ def main():
 
   num_dias = st.number_input("Número de dias a serem somados", min_value=1)
 
-  # Calcular a data após somar os dias úteis
   data_final = calcular_data_util(data_inicial, num_dias, holidays)
 
-  # Exibir o resultado na tela
   st.subheader("Data Após Somar Dias Úteis")
   st.write(data_final.strftime("%d/%m/%Y"))
 
